@@ -34,16 +34,6 @@ $(document).ready(function() {
 <div id="grid">
 </div>
 
-<table>
-{% for y in xrange(3) %}
-<tr>
-{% for x in xrange(3) %}
-<td><div id="grid-{{y}}-{{x}}">{{ player.game.grid[y][x] or '' }}</div></td>
-{% end %}
-</tr>
-{% end %}
-</table>
-
 <div id="messages" style="overflow: scroll; height: 300px;">
 </div>
 
