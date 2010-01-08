@@ -1,0 +1,6 @@
+[submodule "web-socket-js"]
+	path = web-socket-js
+	url = git://github.com/gimite/web-socket-js.git
+[submodule "tornado"]
+	path = tornado
+	url = git://github.com/finiteloop/tornado.git

@@ -1,0 +1,14 @@
+<table>
+{% for y in xrange(3) %}
+<tr>
+{% for x in xrange(3) %}
+<td>
+{% if player.game.grid[y][x] %}
+  {{ player.game.grid[y][x] }}
+{% else %}
+  <a href="#" onclick="ws.send('MOVE:{{y}}:{{x}}');return false;">*</a>
+{% end %}
+{% end %}
+</tr>
+{% end %}
+</table>

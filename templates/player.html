@@ -1,0 +1,50 @@
+<html>
+<head>
+<title>Tic Tac Toe - {{ player.symbol }}</title>
+<style>
+#grid { font-size: 250%; font-family: sans-serif; }
+</style>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<script type="text/javascript" src="/static/swfobject.js"></script>
+<script type="text/javascript" src="/static/FABridge.js"></script>
+<script type="text/javascript" src="/static/web_socket.js"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+<script>
+WebSocket.__swfLocation = "/static/WebSocketMain.swf";
+
+function update_grid() {
+    $('#grid').load(location.pathname + '/grid');
+}
+
+$(document).ready(function() {
+    ws = new WebSocket('ws://' + location.hostname + ':' + location.port + location.pathname + '/ws')
+
+    ws.onmessage = function(msg) {
+        update_grid();
+        $('#messages').prepend(msg.data + '<br/>');
+    }
+
+    update_grid();
+});
+</script>
+</head>
+<body>
+<h1>Tic Tac Toe - {{ player.symbol }}</h1>
+
+<div id="grid">
+</div>
+
+<table>
+{% for y in xrange(3) %}
+<tr>
+{% for x in xrange(3) %}
+<td><div id="grid-{{y}}-{{x}}">{{ player.game.grid[y][x] or '' }}</div></td>
+{% end %}
+</tr>
+{% end %}
+</table>
+
+<div id="messages" style="overflow: scroll; height: 300px;">
+</div>
+
+</body>
