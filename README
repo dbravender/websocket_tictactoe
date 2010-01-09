@@ -1,2 +1,5 @@
-1. Run the socketpolicy server "sudo perl -T socketpolicy/socketpolicy.pl". It runs a small server on port 843 which is required by Flash to make socket connections. See http://www.lightsphere.com/dev/articles/flash_socket_policy.html
-2. python server.py
+1. git submodule init
+2. git submodule update
+3. sudo perl -T socketpolicy/socketpolicy.pl 
+   (This runs a small server on port 843 which is required by Flash to make socket connections. See http://www.lightsphere.com/dev/articles/flash_socket_policy.html)
+4. python server.py
