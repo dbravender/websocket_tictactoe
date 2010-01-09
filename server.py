@@ -28,28 +28,24 @@ class Game(object):
         self.turn_order = cycle(self.players)
         self.next_player = self.turn_order.next()
         self.winner = None
-        self.broadcast(None, 'MSG: New game')
+        self.broadcast('New game')
 
-    def broadcast(self, sender, message):
-        ''' broadcast will send a message to all players except the sender.
-            Using None as the sender will broadcast to all players'''
+    def make_move(self, player, x, y):
+        if player != self.next_player:
+            player.socket.write_message('ERR: Out of turn!')
+            return
+        if self.grid[y][x] != None:
+            player.socket.write_message('ERR: Space occupied')
+            return
+        self.grid[y][x] = player.symbol
+        self.broadcast('%s played at %s, %s' % (player.symbol, x, y))
+        self.check_winner()
+        self.next_player = self.turn_order.next()
+
+    def broadcast(self, message):
         try:
-            if sender and sender != self.next_player:
-                sender.socket.write_message('ERR: Out of turn!')
-                return
-            if message.startswith('MOVE:'):
-                _, x, y = message.split(':')
-                if self.grid[int(x)][int(y)] != None:
-                    sender.socket.write_message('ERR: Space occupied')
-                    return
-                self.grid[int(x)][int(y)] = sender.symbol
-                self.check_winner()
-                self.next_player = self.turn_order.next()
             for player in self.players:
-                if player == sender:
-                    player.socket.write_message('UPDATE')
-                if player != sender:
-                    player.socket.write_message(message)
+                player.socket.write_message(message)
         except:
             traceback.print_exc()
     
@@ -76,7 +72,7 @@ class Game(object):
                                         self.grid[2][0]]):
                     self.winner = player.symbol
         if self.winner:
-            self.broadcast(None, 'WIN: ' + self.winner)
+            self.broadcast(self.winner + ' wins!')
             self.start_game()
 
 class Player(object):
@@ -85,6 +81,20 @@ class Player(object):
         self.socket = None
         self.game = game
         self.game.add_player(self)
+        self.callbacks = {}
+
+    def forget(self):
+        self.callbacks = {}
+
+    def remember(self, callback, *args, **kwargs):
+        def doit():
+            callback(*args, **kwargs)
+        cid = str(id(doit))
+        self.callbacks[cid] = doit
+        return cid
+
+    def make_move(self, x, y):
+        self.game.make_move(self, x, y)
 
 class PlayerHandler(tornado.web.RequestHandler):
     def __init__(self, *args, **kwargs):
@@ -105,7 +115,8 @@ class PlayerWebSocket(tornado.websocket.WebSocketHandler):
         self.receive_message(self.on_message)
     
     def on_message(self, message):
-        self.player.game.broadcast(self.player, message)
+        if self.player.callbacks.get(message, None):
+            self.player.callbacks[message]()
         # Keep receiving messages
         self.receive_message(self.on_message)
 
