@@ -3,3 +3,5 @@
 3. sudo perl -T socketpolicy/socketpolicy.pl 
    (This runs a small server on port 843 which is required by Flash to make socket connections. See http://www.lightsphere.com/dev/articles/flash_socket_policy.html)
 4. python server.py
+5. Go to http://localhost:9999/X
+6. Go to http://localhost:9999/O

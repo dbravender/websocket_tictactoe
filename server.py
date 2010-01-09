@@ -45,7 +45,8 @@ class Game(object):
     def broadcast(self, message):
         try:
             for player in self.players:
-                player.socket.write_message(message)
+                if player.socket:
+                    player.socket.write_message(message)
         except:
             traceback.print_exc()
     
